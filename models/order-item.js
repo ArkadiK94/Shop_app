@@ -2,21 +2,17 @@ const Sequelize = require("sequelize");
 
 const sequelize = require("../util/database");
 
-const User = sequelize.define("user", {
+const OrderItem = sequelize.define("orderItem", {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
     autoIncrement: true,
     primaryKey: true
   },
-  name: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  email: {
-    type: Sequelize.STRING,
+  quantity: {
+    type: Sequelize.INTEGER,
     allowNull: false
   }
 });
 
-module.exports = User;
+module.exports = OrderItem;
