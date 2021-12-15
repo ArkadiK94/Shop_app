@@ -25,13 +25,13 @@
                                     </p>
                                 </div>
                                 <div class="card__actions">
-                                    <form action="/admin/edit-product/<%= product.id %>" method="GET">
+                                    <form action="/admin/edit-product/<%= product._id %>" method="GET">
                                         <button type="submit" class="btn">Edit</button>
                                         <input type="hidden" name="edit" value="true">
                                     </form>
                                     <form action="/admin/delete-product" method="POST">
                                         <button class="btn" type="submit">Delete</button>
-                                        <input type="hidden" name="productId" value="<%=product.id%>">
+                                        <input type="hidden" name="productId" value="<%=product._id%>">
                                     </form>
 
                                 </div>
