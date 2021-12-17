@@ -1,7 +1,7 @@
 const Product = require('../models/product');
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
+  Product.fetchAll()
     .then(products=>{
       res.render('shop/product-list', {
         prods: products,
@@ -26,7 +26,7 @@ exports.getProduct = (req, res, next) => {
 }
 
 exports.getIndex = (req, res, next) => {
-  Product.findAll()
+  Product.fetchAll()
     .then(products=>{
       res.render('shop/index', {
         prods: products,
@@ -37,68 +37,43 @@ exports.getIndex = (req, res, next) => {
     .catch(err=>console.log(err));
 };
 
-// exports.getCart = (req, res, next) => {
-//   const user = req.user;
-//   user.getCart()
-//     .then((cart)=>{
-//       return cart.getProducts()
-//     })
-//     .then((products)=>{
-//       res.render('shop/cart', {
-//         path: '/cart',
-//         pageTitle: 'Your Cart',
-//         cartProducts: products
-//       });
-//     })
-//     .catch((err)=>{
-//       console.log(err);
-//     });
-// };
+exports.getCart = (req, res, next) => {
+  req.user.getCart()
+    .then(products=>{
+      res.render('shop/cart', {
+        path: '/cart',
+        pageTitle: 'Your Cart',
+        cartProducts: products
+      });
+    })
+    .catch(err => console.log(err));
+};
 
-// exports.postCart = (req, res, next) => {
-//   const productId = req.body.productId;
-//   const user = req.user;
-//   let theCart;
-//   let theProduct; 
-
-//   Product.findByPk(productId)
-//     .then(product=>{
-//       theProduct = product;
-//       return user.getCart();
-//     })
-//     .then((cart)=>{
-//       theCart = cart;
-//       return theCart.getProducts({where:{id:productId}});
-//     })
-//     .then(([product])=>{
-//       if(!product){
-//         return theCart.addProduct(theProduct,{through:{quantity:1}});
-//       } 
-//       product.cartItem.quantity += 1; 
-//       return product.cartItem.save(); 
-//     })
-//     .then(()=>{
-//       res.redirect("/cart");
-//     })
-//     .catch(err=>console.log(err));
-// };
-
-// exports.postDeleteCartItem = (req, res, next)=>{
-//   const productId = req.body.productId;
-//   const user = req.user;
-//   user.getCart()
-//     .then(cart=>{
-//       return cart.getProducts({where:{id:productId}});
-//     })
-//     .then(([product])=>{
-//       return product.cartItem.destroy();
-//     })
-//     .then(()=>{
-//       res.redirect("/cart");
-//     })
-//     .catch(err=>console.log(err));
+exports.postCart = (req, res, next) => {
+  const productId = req.body.productId;
+  const user = req.user;
   
-// };
+  Product.findById(productId)
+    .then(product=>{
+      return user.addToCart(product);
+    })
+    .then(()=>{
+      res.redirect("/cart");
+    })
+    .catch(err => console.log(err));
+
+};
+
+exports.postDeleteCartItem = (req, res, next)=>{
+  const productId = req.body.productId;
+  const user = req.user;
+  user.deleteFromCart(productId)
+    .then(()=>{
+      res.redirect("/cart");
+    })
+    .catch(err=> console.log(err));
+  
+};
 
 // exports.getOrders = (req, res, next) => {
 //   req.user.getOrders({include:["products"]})
