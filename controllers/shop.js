@@ -75,50 +75,26 @@ exports.postDeleteCartItem = (req, res, next)=>{
   
 };
 
-// exports.getOrders = (req, res, next) => {
-//   req.user.getOrders({include:["products"]})
-//     .then(orders=>{
-//       console.log(2);
-//       res.render('shop/orders', {
-//         path: '/orders',
-//         pageTitle: 'Your Orders',
-//         orders: orders
-//       });
-//     })
-//     .catch(err => console.log(err));  
-// };
+exports.getOrders = (req, res, next) => {
+  req.user.getOrders()
+    .then(orders=>{
+      res.render('shop/orders', {
+        path: '/orders',
+        pageTitle: 'Your Orders',
+        orders: orders
+      });
+    })
+    .catch(err => console.log(err));  
+};
 
-// exports.postOrders = (req, res, next) => {
-//   const user = req.user;
-//   let orderOfUser;
-//   let catOfUser;
-
-//   user.createOrder()
-//     .then(order=>{
-//       orderOfUser = order;
-//       return user.getCart()
-//     })
-//     .then(cart =>{
-//       catOfUser = cart;
-//       return cart.getProducts()
-//     })
-//     .then(products =>{
-//       return orderOfUser.addProduct(products.map(prod=>{
-//         prod.orderItem = {quantity: prod.cartItem.quantity};
-//         return prod; 
-//       }));
-
-//     })
-//     .then((p)=>{
-//       console.log(p)
-
-//       return catOfUser.setProducts(null);
-//     })
-//     .then(()=>{
-//       res.redirect("/orders");
-//     })
-//     .catch(err=>console.log(err));
-// }
+exports.postOrders = (req, res, next) => {
+  const user = req.user;
+  user.addOrder()
+    .then(()=>{
+      res.redirect("/orders");
+    })
+    .catch(err=>console.log(err));
+}
 
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/checkout', {
