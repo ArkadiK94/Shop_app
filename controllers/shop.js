@@ -101,6 +101,10 @@ exports.postOrders = (req, res, next) => {
     .catch(err=>console.log(err));
 }
 
+// exports.postLogin = (req, res, next) =>{
+//   res.redirect("/login");
+// }
+
 // exports.getCheckout = (req, res, next) => {
 //   res.render('shop/checkout', {
 //     path: '/checkout',
