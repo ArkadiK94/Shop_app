@@ -5,14 +5,14 @@ const Order = require("./order");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  username: {
-    type: String,
-    required: true
-  },
   email: {
     type: String,
     required: true
   }, 
+  password: {
+    type: String,
+    required: true
+  },
   cart: {
     items: [
       {
@@ -76,12 +76,11 @@ userSchema.methods.addOrder = function(){
         prodsArray.push(newProd);
         totalPrice += +newProd.price * +newProd.quantity;
       })
-      console.log(totalPrice);
       const order = new Order({
         items:[...prodsArray], 
         user:{
           _id:this._id, 
-          username:this.username
+          email:this.email
         },
         totalPrice: totalPrice
       });
