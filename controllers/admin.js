@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const User = require('../models/user');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -49,17 +50,21 @@ exports.postEditProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const productId = req.body.productId;
+  const user = req.session.user;
 
   Product.findById(productId)
     .then( product=>{
+      if(product.userId.toString() !== user._id.toString()){
+        return res.redirect("/");
+      } 
       product.title = title;
       product.imageUrl = imageUrl;
       product.price = price;
       product.description = description;
-      return product.save();
-    })
-    .then(()=>{
-      res.redirect('/admin/products');
+      return product.save()
+        .then(()=>{
+          res.redirect('/admin/products');
+        });
     })
     .catch((err)=>{
       console.log(err);
@@ -70,12 +75,21 @@ exports.postDeleteProduct = (req, res, next)=>{
   const productId = req.body.productId;
   const user = req.session.user;
 
-  Product.findByIdAndDelete(productId)
-    .then(()=>{
-      return user.deleteFromCart(productId);
-    })
-    .then(()=>{
-      res.redirect("/admin/products")
+  Product.findById(productId)
+    .then(product=>{
+      if(product.userId.toString() !== user._id.toString()){
+        return res.redirect("/");
+      }
+      return product.remove()
+        .then(()=>{
+          return User.updateMany(
+            {"cart.items.productId" : productId},
+            {$pull:{"cart.items":{productId:productId}}}
+          );
+        })
+        .then(()=>{
+          return res.redirect("/admin/products");
+        });
     })
     .catch((err)=>{
       console.log(err);
@@ -83,7 +97,7 @@ exports.postDeleteProduct = (req, res, next)=>{
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({userId: req.session.user._id})
     .then(products =>{
       res.render('admin/products', {
         prods: products,
