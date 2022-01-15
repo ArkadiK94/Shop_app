@@ -146,6 +146,8 @@ exports.getReset = (req, res, next) =>{
 
 exports.postReset = (req, res, next) =>{
   const errorResult = validationResult(req);
+  const userEmail = req.body.email;
+
   if(!errorResult.isEmpty()){
     const errorMessage = errorResult.array();
     return res.status(422).render('auth/reset',{
@@ -156,7 +158,6 @@ exports.postReset = (req, res, next) =>{
       validationErrors : errorMessage
     })
   }
-  const userEmail = req.body.email;
   User.findOne({email: userEmail})
     .then(user =>{
       return crypto.randomBytes(32, (err, buffer)=>{

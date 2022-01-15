@@ -1,3 +1,5 @@
+const {validationResult} = require('express-validator');
+
 const Product = require('../models/product');
 const User = require('../models/user');
 
@@ -6,6 +8,16 @@ exports.getAddProduct = (req, res, next) => {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
     edit: false,
+    errorMessage: null,
+    validationError: [],
+    hasError: false,
+    product: {
+      title: "",
+      imageUrl: "",
+      price: "",
+      description: ""
+    }
+
   });
 };
 
@@ -16,7 +28,25 @@ exports.postAddProduct = (req, res, next) => {
   const description = req.body.description;
   const user = req.session.user;
   const newProduct = new Product({title, imageUrl, price, description, userId: user});
-  
+  const error = validationResult(req);
+
+  if(!error.isEmpty()){
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      edit: false,
+      hasError: true,
+      errorMessage: error.array()[0].msg,
+      validationError: error.array(),
+      product: {
+        title: title,
+        imageUrl: imageUrl,
+        price: price,
+        description: description
+      }
+    });
+  }
+
   newProduct.save()
     .then(()=>{
       res.redirect('/');
@@ -37,6 +67,9 @@ exports.getEditProduct = (req, res, next) => {
         path: '/admin/edit-product',
         edit: editMode,
         product: product,
+        errorMessage: null,
+        validationError: [],
+        hasError: false
       });
     })
     .catch(err=>{
@@ -51,6 +84,25 @@ exports.postEditProduct = (req, res, next) => {
   const description = req.body.description;
   const productId = req.body.productId;
   const user = req.session.user;
+  const error = validationResult(req);
+
+  if(!error.isEmpty()){
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Edit Product',
+      path: '/admin/edit-product',
+      edit: true,
+      product: {
+        title: title,
+        imageUrl: imageUrl,
+        price: price,
+        description: description,
+        _id: productId
+      },
+      errorMessage: error.array()[0].msg,
+      validationError: error.array(),
+      hasError: true
+    });
+  }
 
   Product.findById(productId)
     .then( product=>{
@@ -61,6 +113,7 @@ exports.postEditProduct = (req, res, next) => {
       product.imageUrl = imageUrl;
       product.price = price;
       product.description = description;
+      
       return product.save()
         .then(()=>{
           res.redirect('/admin/products');

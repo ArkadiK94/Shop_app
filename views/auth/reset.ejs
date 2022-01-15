@@ -7,9 +7,9 @@
 <%- include('../includes/navigation.ejs') %>
 <main>
   <% if(errorMessage){ %>
-    <div class="user-message user-message--error"><%= errorMessage %></div>
+    <div class="user-message user-message__error"><%= errorMessage %></div>
   <% } %>
-  <form class="login-form" action="/reset" method="POST" novalidate>
+  <form class="login-form" action="/reset" method="POST">
     <div class="form-control">
       <label for="username">E-mail</label>
       <input 

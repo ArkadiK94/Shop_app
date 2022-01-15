@@ -7,11 +7,11 @@
   <%- include('../includes/navigation.ejs') %>
   <main>
     <% if(errorMessage){ %>
-      <div class="user-message user-message--error"><%= errorMessage %></div>
+      <div class="user-message user-message__error"><%= errorMessage %></div>
     <% }else if(successMessage) {%>
-      <div class="user-message user-message--success"><%= successMessage %></div>
+      <div class="user-message user-message__success"><%= successMessage %></div>
     <% } %>
-    <form class="login-form" action="/login" method="POST" novalidate>
+    <form class="login-form" action="/login" method="POST">
       <div class="form-control">
         <label for="username">E-mail</label>
         <input 
