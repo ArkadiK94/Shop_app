@@ -6,6 +6,8 @@ const sendgridTransport = require('nodemailer-sendgrid-transport');
 const {validationResult} = require("express-validator");
 
 const User = require('../models/user');
+const errorFunctionSend = require("../util/errorSend");
+
 
 const transporter = nodemailer.createTransport(sendgridTransport({
   auth:{
@@ -66,19 +68,21 @@ exports.postLogin = (req, res, next) =>{
           req.session.userId = user._id;
           req.session.save((err)=>{
             if(err){
-              console.log(err);
+              return errorFunctionSend(err,next);
             }
             res.redirect("/");
           });
         })
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
 }
 
 exports.getLogout = (req, res, next) =>{
   req.session.destroy((err)=>{
     if(err){
-      console.log(err);
+      return errorFunctionSend(err,next);
     }
     res.redirect('/');
   });
@@ -125,7 +129,9 @@ exports.postSignup = (req, res, next) =>{
           });
         });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      return errorFunctionSend(err,next);
+    });
 }
 
 exports.getReset = (req, res, next) =>{
@@ -162,8 +168,7 @@ exports.postReset = (req, res, next) =>{
     .then(user =>{
       return crypto.randomBytes(32, (err, buffer)=>{
         if(err){
-          console.log(err);
-          return res.redirect('/');
+          return errorFunctionSend(err,next);
         }
         const token = buffer.toString('hex');
         user.resetToken = token;
@@ -183,7 +188,9 @@ exports.postReset = (req, res, next) =>{
           })
       })
     })
-    .catch(err => console.log(err));
+    .catch(err => { 
+      return errorFunctionSend(err,next);
+    });
 }
 
 exports.getNewPassword = (req, res, next)=>{
@@ -204,7 +211,9 @@ exports.getNewPassword = (req, res, next)=>{
         validationErrors : []
       })
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
 }
 
 exports.postNewPassword = (req, res, next)=>{
@@ -242,5 +251,7 @@ exports.postNewPassword = (req, res, next)=>{
           return res.redirect('/login');
         })        
     })
-    .catch(err=> console.log(err));
+    .catch(err=> { 
+      return errorFunctionSend(err,next);
+    });
 }

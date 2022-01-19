@@ -2,6 +2,7 @@ const {validationResult} = require('express-validator');
 
 const Product = require('../models/product');
 const User = require('../models/user');
+const errorFunctionSend = require("../util/errorSend");
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -51,7 +52,9 @@ exports.postAddProduct = (req, res, next) => {
     .then(()=>{
       res.redirect('/');
     })
-    .catch(err=> console.log(err));
+    .catch(err=> {
+      return errorFunctionSend(err,next);
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -73,7 +76,7 @@ exports.getEditProduct = (req, res, next) => {
       });
     })
     .catch(err=>{
-      throw err;
+      return errorFunctionSend(err,next);
     });
 };
 
@@ -119,7 +122,9 @@ exports.postEditProduct = (req, res, next) => {
           res.redirect('/admin/products');
         });
     })
-    .catch((err)=>console.log(err));
+    .catch((err)=>{
+      return errorFunctionSend(err,next);
+    });
 };
 
 exports.postDeleteProduct = (req, res, next)=>{
@@ -142,7 +147,9 @@ exports.postDeleteProduct = (req, res, next)=>{
           return res.redirect("/admin/products");
         });
     })
-    .catch((err)=>console.log(err));
+    .catch((err)=>{
+      return errorFunctionSend(err,next);
+    });
 }
 
 exports.getProducts = (req, res, next) => {
@@ -155,6 +162,6 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch(err=>{
-      throw err;
+      return errorFunctionSend(err,next);
     });
 };

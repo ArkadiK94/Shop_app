@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 
 const Order = require("./order");
 
+const errorFunctionSend = require("../util/errorSend");
+
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -59,7 +62,9 @@ userSchema.methods.getCart = function(){
   .then(user=>{
     return user.cart.items;
   })
-  .catch(err => console.log(err));
+  .catch(err => { 
+    return errorFunctionSend(err,next);
+  });
 }
 
 userSchema.methods.addOrder = function(){
@@ -92,7 +97,9 @@ userSchema.methods.addOrder = function(){
       this.cart.items = [];
       return this.save()
     })
-    .catch(err => console.log(err));
+    .catch(err => { 
+      return errorFunctionSend(err,next);
+    });
 }
 
 userSchema.methods.getOrders = function(){

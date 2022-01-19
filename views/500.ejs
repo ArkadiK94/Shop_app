@@ -1,0 +1,13 @@
+<%- include('includes/head.ejs') %>
+</head>
+
+<body>
+    <%- include('includes/navigation.ejs') %>
+    <h1>Error occured !</h1>
+    <p>
+        Sorry, it will take us time to fix the error, pls, come back later 
+        <br>
+        <%= errorMessage ? `${errorMessage}`: ""%>
+    </p>
+
+<%- include('includes/end.ejs') %>

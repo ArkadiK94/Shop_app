@@ -10,6 +10,12 @@ const flash = require('connect-flash');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 const csrf = require('csurf');
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
+const errorRoutes = require("./routes/error");
+const errorFunctionSend = require("./util/errorSend");
+
 
 const app = express();
 const csrfProtection = csrf();
@@ -17,9 +23,6 @@ const csrfProtection = csrf();
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
-const authRoutes = require('./routes/auth');
 
 const MONGODB_URI = 'mongodb+srv://ArkadiK:Arkadi$29081994@nodeapp.aoeo9.mongodb.net/shop?retryWrites=true&w=majority';
 const store = new MongoDBStore({
@@ -54,7 +57,9 @@ app.use((req, res, next)=>{
         req.session.user = user;
         next();
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        return errorFunctionSend(err,next);
+      });
   } else {
     next();
   }
@@ -63,12 +68,19 @@ app.use((req, res, next)=>{
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
-
+app.use(errorRoutes);
 
 app.use(errorController.get404);
+
+app.use((err, req, res ,next)=>{
+  const statusCode = err.httpStatusCode
+  res.status(statusCode).render('500', { pageTitle: 'Error Occurred', path: '/500', errorMessage: err});
+});
 
 mongoose.connect(MONGODB_URI)
   .then(()=>{
     app.listen(3000);
   })
-  .catch(err => console.log(err));
+  .catch(err => { 
+    throw new Error(err);
+  });

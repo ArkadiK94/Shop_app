@@ -1,5 +1,8 @@
 const Product = require('../models/product');
 
+const errorFunctionSend = require("../util/errorSend");
+
+
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then(products=>{
@@ -9,7 +12,9 @@ exports.getProducts = (req, res, next) => {
         path: '/products',
       });
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
 };
 
 exports.getProduct = (req, res, next) => {
@@ -22,7 +27,9 @@ exports.getProduct = (req, res, next) => {
         path: "/products"
       });
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
 }
 
 exports.getIndex = (req, res, next) => {
@@ -34,7 +41,9 @@ exports.getIndex = (req, res, next) => {
         path: '/'
       });
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
 };
 
 exports.getCart = (req, res, next) => {
@@ -47,7 +56,9 @@ exports.getCart = (req, res, next) => {
         cartProducts: products,
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => { 
+      return errorFunctionSend(err,next);
+    });
 };
 
 exports.postCart = (req, res, next) => {
@@ -60,7 +71,9 @@ exports.postCart = (req, res, next) => {
     .then(()=>{
       res.redirect("/cart");
     })
-    .catch(err => console.log(err));
+    .catch(err => { 
+      return errorFunctionSend(err,next);
+    });
 
 };
 
@@ -71,7 +84,9 @@ exports.postDeleteCartItem = (req, res, next)=>{
     .then(()=>{
       res.redirect("/cart");
     })
-    .catch(err=> console.log(err));
+    .catch(err=> { 
+      return errorFunctionSend(err,next);
+    });
   
 };
 
@@ -89,7 +104,9 @@ exports.getOrders = (req, res, next) => {
         total: total
       });
     })
-    .catch(err => console.log(err));  
+    .catch(err => { 
+      return errorFunctionSend(err,next);
+    });  
 };
 
 exports.postOrders = (req, res, next) => {
@@ -98,7 +115,9 @@ exports.postOrders = (req, res, next) => {
     .then(()=>{
       res.redirect("/orders");
     })
-    .catch(err=>console.log(err));
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
 }
 
 // exports.getCheckout = (req, res, next) => {
