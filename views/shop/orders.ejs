@@ -14,12 +14,12 @@
                                 <% order.items.forEach(product=>{ %>
                                     <li class="orders__products-item"><%=product.title%>(<%=product.quantity%>)</li>
                                 <% }); %>
-                                <div>Total Price of The Order: $<%=order.totalPrice%> </div>
+                                <div>Order Price : $<%=order.totalPrice%> </div>
                             </ul>
                         </li>
                     <% }); %>
                 </ul>
-                <h2 class="centered">Total Price: $<%=total%></h2>
+                <h2 class="centered">Invoice Total Price: $<%=total%></h2>
             <% } else{%>
                 <h1>Nothing there!</h1>
             <% } %>

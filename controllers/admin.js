@@ -14,7 +14,6 @@ exports.getAddProduct = (req, res, next) => {
     hasError: false,
     product: {
       title: "",
-      imageUrl: "",
       price: "",
       description: ""
     }
@@ -24,13 +23,11 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const imageFile = req.file;
   const price = req.body.price;
   const description = req.body.description;
   const user = req.session.user;
-  const newProduct = new Product({title, imageUrl, price, description, userId: user});
   const error = validationResult(req);
-
   if(!error.isEmpty()){
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
@@ -41,12 +38,28 @@ exports.postAddProduct = (req, res, next) => {
       validationError: error.array(),
       product: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description
       }
     });
   }
+  if(!imageFile){
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      edit: false,
+      hasError: true,
+      errorMessage: "Pls, add image",
+      validationError: [],
+      product: {
+        title: title,
+        price: price,
+        description: description
+      }
+    });
+  }
+  const imageUrl = `/images/${imageFile.filename}`;
+  const newProduct = new Product({title, imageUrl, price, description, userId: user});
 
   newProduct.save()
     .then(()=>{
@@ -82,13 +95,12 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const imageFile = req.file;
   const price = req.body.price;
   const description = req.body.description;
   const productId = req.body.productId;
   const user = req.session.user;
   const error = validationResult(req);
-
   if(!error.isEmpty()){
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Edit Product',
@@ -96,7 +108,6 @@ exports.postEditProduct = (req, res, next) => {
       edit: true,
       product: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description,
         _id: productId
@@ -113,7 +124,10 @@ exports.postEditProduct = (req, res, next) => {
         return res.redirect("/");
       } 
       product.title = title;
-      product.imageUrl = imageUrl;
+      if(imageFile){
+        const imageUrl = `/images/${imageFile.filename}`;
+        product.imageUrl = imageUrl;
+      }
       product.price = price;
       product.description = description;
       

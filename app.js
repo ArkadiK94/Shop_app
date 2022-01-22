@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
+const multer = require('multer');
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -19,6 +20,22 @@ const errorFunctionSend = require("./util/errorSend");
 
 const app = express();
 const csrfProtection = csrf();
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb)=>{
+    cb(null, "./public/images");
+  },
+  filename: (req, file, cb)=>{
+    const date = (new Date().toISOString()).replace(/:/g,".");
+    cb(null, date +'-name_' + file.originalname);
+  }
+});
+const fileFilter = (req, file, cb)=>{
+  if(file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -31,7 +48,7 @@ const store = new MongoDBStore({
 });
 
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("image"));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
@@ -53,13 +70,13 @@ app.use(flash());
 app.use((req, res, next)=>{
   if(req.session.isLoggedIn){
     User.findById(req.session.userId)
-      .then((user)=>{
-        req.session.user = user;
-        next();
-      })
-      .catch(err => {
-        return errorFunctionSend(err,next);
-      });
+    .then((user)=>{
+      req.session.user = user;
+      next();
+    })
+    .catch(err => {
+      return errorFunctionSend(err,next);
+    });
   } else {
     next();
   }
@@ -73,7 +90,17 @@ app.use(errorRoutes);
 app.use(errorController.get404);
 
 app.use((err, req, res ,next)=>{
-  const statusCode = err.httpStatusCode
+  console.log(err);
+  let statusCode = err.httpStatusCode
+  if(!statusCode){
+    statusCode = 500;
+  }
+  if(!res.locals.isLoggedIn) {
+    res.locals.isLoggedIn = false;
+  }
+  if(!res.locals.csrfToken){
+    res.locals.csrfToken = false;
+  }
   res.status(statusCode).render('500', { pageTitle: 'Error Occurred', path: '/500', errorMessage: err});
 });
 
