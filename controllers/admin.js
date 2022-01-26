@@ -170,12 +170,27 @@ exports.postDeleteProduct = (req, res, next)=>{
 }
 
 exports.getProducts = (req, res, next) => {
+  const page = +req.query.page || 1;
+  const ITEMS_PER_PAGE = 3;
+  let totalItems;
   Product.find({userId: req.session.user._id})
-    .then(products =>{
+    .countDocuments()
+    .then(numberOfProducts=>{
+      totalItems = numberOfProducts;
+      return Product.find().skip((page -1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE)
+    })
+    .then(products=>{
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
         path: '/admin/products',
+        currentPage: page, 
+        hasNextPage: ITEMS_PER_PAGE * page < totalItems, 
+        hasPriviousPage: page > 1,
+        nextPage: page+1,
+        priviousPage: page-1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+
       });
     })
     .catch(err=>{
