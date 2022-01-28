@@ -143,8 +143,8 @@ exports.postEditProduct = (req, res, next) => {
     });
 };
 
-exports.postDeleteProduct = (req, res, next)=>{
-  const productId = req.body.productId;
+exports.deleteProduct = (req, res, next)=>{
+  const productId = req.params.productId;
   const user = req.session.user;
 
   Product.findById(productId)
@@ -161,11 +161,11 @@ exports.postDeleteProduct = (req, res, next)=>{
           );
         })
         .then(()=>{
-          return res.redirect("/admin/products");
+          res.status(200).json({message: "Success!"});
         });
     })
     .catch((err)=>{
-      return errorFunctionSend(err,next);
+      res.status(500).json({message: `Deleting Product Filed. Err ${err}`});
     });
 }
 

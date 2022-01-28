@@ -10,7 +10,7 @@ const errorFunctionSend = require("../util/errorSend");
 
 exports.getProducts = (req, res, next) => {
   const page = +req.query.page || 1;
-  const ITEMS_PER_PAGE = 4;
+  const ITEMS_PER_PAGE = 3;
   let totalItems;
   Product.find()
     .countDocuments()
@@ -54,7 +54,7 @@ exports.getProduct = (req, res, next) => {
 
 exports.getIndex = (req, res, next) => {
   const page = +req.query.page || 1;
-  const ITEMS_PER_PAGE = 4;
+  const ITEMS_PER_PAGE = 3;
   let totalItems;
   Product.find()
     .countDocuments()
@@ -112,15 +112,15 @@ exports.postCart = (req, res, next) => {
 
 };
 
-exports.postDeleteCartItem = (req, res, next)=>{
-  const productId = req.body.productId;
+exports.deleteCartItem = (req, res, next)=>{
+  const productId = req.params.productId;
   const user = req.session.user;
   user.deleteFromCart(productId)
     .then(()=>{
-      res.redirect("/cart");
+      res.status(200).json({message: "Success!"});
     })
     .catch(err=> { 
-      return errorFunctionSend(err,next);
+      res.status(500).json({message: `Deleting Product Failed. Err ${err}`});
     });
   
 };
