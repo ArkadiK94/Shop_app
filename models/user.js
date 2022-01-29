@@ -4,7 +4,6 @@ const Order = require("./order");
 
 const errorFunctionSend = require("../util/errorSend");
 
-
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({

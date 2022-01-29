@@ -144,16 +144,6 @@ exports.getOrders = (req, res, next) => {
     });  
 };
 
-exports.postOrders = (req, res, next) => {
-  const user = req.session.user;
-  user.addOrder()
-    .then(()=>{
-      res.redirect("/orders");
-    })
-    .catch(err=>{
-      return errorFunctionSend(err,next);
-    });
-}
 exports.getInvoice = (req, res, next)=>{
   const orderId = req.params.orderId;
   Order.findById(orderId)
@@ -185,9 +175,31 @@ exports.getInvoice = (req, res, next)=>{
 
 }
 
-// exports.getCheckout = (req, res, next) => {
-//   res.render('shop/checkout', {
-//     path: '/checkout',
-//     pageTitle: 'Checkout',
-//   });
-// };
+exports.getCheckout = (req, res, next) => {
+  const user = req.session.user;
+  let total = 0;
+  user.getCart()
+    .then(products=>{
+      products.forEach(prod => total += prod.productId.price * prod.quantity);
+      res.render('shop/checkout', {
+        path: '/checkout',
+        pageTitle: 'Checkout',
+        cartProducts: products,
+        totalPrice: total
+      });
+    })
+    .catch(err => { 
+      return errorFunctionSend(err,next);
+    });
+};
+
+exports.postCheckout = (req, res, next) => {
+  const user = req.session.user;
+  user.addOrder()
+    .then(()=>{
+      res.redirect("/orders");
+    })
+    .catch(err=>{
+      return errorFunctionSend(err,next);
+    });
+};

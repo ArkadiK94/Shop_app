@@ -1,0 +1,31 @@
+<%- include('../includes/head.ejs') %>
+        <link rel="stylesheet" href="/css/cart.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main>
+            <% if(cartProducts.length){ %>
+                <ul class='cart__item-list'>
+                    <% cartProducts.forEach(prod=>{ %>
+                        <li class='cart__item'>
+                            <div><%=prod.productId.title%> (qty <%=prod.quantity%>)</div>
+                            <div>Total Price: $<%=prod.productId.price * prod.quantity%></div>
+                        </li>
+                    <% }); %>
+                </ul>
+                <div class="centered checkout">
+                    <h2>Total Order Price: $<%=totalPrice%></h2>
+                    <form action='/checkout' method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" class="btn checkout__btn">Purchase</button>           
+                    </form>
+                    <div class="checkout__method-payments">
+                        <img src="/icons/paypal.png" alt="paypal">
+                    </div>
+                </div>
+            <% } else{%>
+                <h1>No Products In The Cart</h1>
+            <% } %>
+        </main>
+<%- include('../includes/end.ejs') %>

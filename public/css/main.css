@@ -277,6 +277,19 @@ form {
   background-color:#00695c;
 }
 
+.checkout {
+  display: flex;
+  flex-direction: column;
+} 
+.checkout .checkout__btn{
+  margin-top: 5px;
+}
+
+.checkout .checkout__method-payments img{
+  width: 80px;
+  margin: 10px auto;
+}
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

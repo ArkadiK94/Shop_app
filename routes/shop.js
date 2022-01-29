@@ -20,12 +20,11 @@ router.delete("/cart/:productId", isAuth, shopController.deleteCartItem);
 
 router.get('/orders', isAuth, shopController.getOrders);
 
-router.post('/orders', isAuth, shopController.postOrders);
-
 router.get('/orders/:orderId', isAuth, shopController.getInvoice);
 
+router.get('/checkout', isAuth, shopController.getCheckout);
 
+router.post('/checkout', isAuth, shopController.postCheckout);
 
-// router.get('/checkout', isAuth, shopController.getCheckout);
 
 module.exports = router;
