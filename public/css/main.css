@@ -284,10 +284,9 @@ form {
 .checkout .checkout__btn{
   margin-top: 5px;
 }
-
-.checkout .checkout__method-payments img{
-  width: 80px;
-  margin: 10px auto;
+.checkout #checkout__btn-paypal{
+  width: 250px;
+  margin: 0 auto;
 }
 
 @media (min-width: 768px) {

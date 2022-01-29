@@ -1,7 +1,10 @@
+require("dotenv").config();
+
 const fs = require("fs");
 const path = require("path");
 
 const PDFDocument = require('pdfkit');
+const paypal = require("@paypal/checkout-server-sdk");
 
 const Product = require('../models/product');
 const Order = require("../models/order");
@@ -144,6 +147,17 @@ exports.getOrders = (req, res, next) => {
     });  
 };
 
+exports.postOrders = (req, res, next) => {
+  const user = req.session.user;
+  user.addOrder()
+    .then(()=>{
+      res.status(200).json({url: "/orders"});
+    })
+    .catch(err=>{
+      res.status(500).json({err: err.message});
+    });
+}
+
 exports.getInvoice = (req, res, next)=>{
   const orderId = req.params.orderId;
   Order.findById(orderId)
@@ -195,11 +209,53 @@ exports.getCheckout = (req, res, next) => {
 
 exports.postCheckout = (req, res, next) => {
   const user = req.session.user;
-  user.addOrder()
-    .then(()=>{
-      res.redirect("/orders");
+  const Environment = process.env.NODE_ENV === 'production' 
+    ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+  const paypalClient = new paypal.core.PayPalHttpClient(new Environment(
+    process.env.PAYPAL_CLIENT_ID,
+    process.env.PAYPAL_CLIENT_SECRET,
+  ));
+  const request = new paypal.orders.OrdersCreateRequest();
+  request.prefer("return=representation");
+  let total = 0;
+  user.getCart()
+    .then(products =>{
+      products.forEach(prod => total += +prod.productId.price * +prod.quantity);
+      return request.requestBody({
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "USD",
+              value: total,
+              breakdown:{
+                item_total:{
+                  currency_code:"USD",
+                  value:total
+                }
+              }
+            },
+            items: products.map(prod=>{
+              return {
+                name: prod.productId.title,
+                unit_amount: {
+                  currency_code: "USD",
+                  value: prod.productId.price
+                },
+                quantity: prod.quantity
+              }
+            })
+          }
+        ]
+      });
     })
-    .catch(err=>{
-      return errorFunctionSend(err,next);
+    .then(request =>{
+      return paypalClient.execute(request);
+    })
+    .then((orderReq)=>{
+      res.status(200).json({id: orderReq.result.id});   
+    })
+    .catch(err => { 
+      res.status(500).json({error: err.message})
     });
 };

@@ -126,7 +126,7 @@ exports.postEditProduct = (req, res, next) => {
       } 
       product.title = title;
       if(imageFile){
-        fileHelper.deleteFile(`./public/${product.imageUrl}`); 
+        fileHelper.deleteFile(`./${product.imageUrl}`); 
         const imageUrl = `/images/${imageFile.filename}`;
         product.imageUrl = imageUrl;
       }
@@ -152,7 +152,7 @@ exports.deleteProduct = (req, res, next)=>{
       if(product.userId.toString() !== user._id.toString()){
         return res.redirect("/");
       }
-      fileHelper.deleteFile(`./public/${product.imageUrl}`); 
+      fileHelper.deleteFile(`./${product.imageUrl}`); 
       return product.remove()
         .then(()=>{
           return User.updateMany(
@@ -177,7 +177,7 @@ exports.getProducts = (req, res, next) => {
     .countDocuments()
     .then(numberOfProducts=>{
       totalItems = numberOfProducts;
-      return Product.find().skip((page -1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE)
+      return Product.find({userId: req.session.user._id}).skip((page -1) * ITEMS_PER_PAGE).limit(ITEMS_PER_PAGE)
     })
     .then(products=>{
       res.render('admin/products', {

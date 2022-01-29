@@ -16,16 +16,13 @@
                 </ul>
                 <div class="centered checkout">
                     <h2>Total Order Price: $<%=totalPrice%></h2>
-                    <form action='/checkout' method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <button type="submit" class="btn checkout__btn">Purchase</button>           
-                    </form>
-                    <div class="checkout__method-payments">
-                        <img src="/icons/paypal.png" alt="paypal">
-                    </div>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div id="checkout__btn-paypal"></div>
                 </div>
             <% } else{%>
                 <h1>No Products In The Cart</h1>
             <% } %>
         </main>
+    <script src="https://www.paypal.com/sdk/js?client-id=AZ5wJYgHLcBMkMstyFLDPTcQohyRsHa8p6Kt2ZnRGKVJ6hvCmDWyeXkl--ARSeKZoWM44_uT-LzGz94G"></script>    
+    <script src="/js/checkout.js"></script>
 <%- include('../includes/end.ejs') %>
