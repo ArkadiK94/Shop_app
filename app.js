@@ -41,9 +41,8 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 
-const MONGODB_URI = 'mongodb+srv://ArkadiK:Arkadi$29081994@nodeapp.aoeo9.mongodb.net/shop?retryWrites=true&w=majority';
 const store = new MongoDBStore({
-  uri: MONGODB_URI,
+  uri: process.env.MONGODB_URI,
   collection: 'sessions'
 });
 
@@ -106,7 +105,7 @@ app.use((err, req, res ,next)=>{
   res.status(statusCode).render('500', { pageTitle: 'Error Occurred', path: '/500', errorMessage: err});
 });
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(()=>{
     app.listen(3000);
   })
