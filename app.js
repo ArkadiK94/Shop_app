@@ -42,7 +42,7 @@ app.set('views', 'views');
 
 
 const store = new MongoDBStore({
-  uri: process.env.MONGODB_URI,
+  uri: proccess.env.MONGODB_URI,
   collection: 'sessions'
 });
 
