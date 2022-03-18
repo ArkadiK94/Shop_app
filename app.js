@@ -104,11 +104,11 @@ app.use((err, req, res ,next)=>{
   }
   res.status(statusCode).render('500', { pageTitle: 'Error Occurred', path: '/500', errorMessage: err});
 });
-
 mongoose.connect(process.env.MONGODB_URI)
   .then(()=>{
-    app.listen(3000);
+    app.listen(process.env.PORT||3000);
   })
   .catch(err => { 
+    console.log(process.env.MONGODB_URI);
     throw new Error(err);
   });
