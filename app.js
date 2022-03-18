@@ -8,6 +8,8 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
 const multer = require('multer');
+const helmet = require("helmet");
+const compression = require("compression");
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -57,6 +59,9 @@ app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("image"));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/images",express.static(path.join(__dirname, 'images')));
+
+app.use(helmet());
+app.use(compression());
 
 app.use(session({
   secret: "this is a secret code",
