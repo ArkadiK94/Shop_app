@@ -209,8 +209,9 @@ exports.getCheckout = (req, res, next) => {
 
 exports.postCheckout = (req, res, next) => {
   const user = req.session.user;
-  const Environment = process.env.NODE_ENV === 'production' 
-    ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+  // const Environment = process.env.NODE_ENV === 'production' 
+  //   ? paypal.core.LiveEnvironment : paypal.core.SandboxEnvironment;
+  const Environment = paypal.core.SandboxEnvironment;
   const paypalClient = new paypal.core.PayPalHttpClient(new Environment(
     process.env.PAYPAL_CLIENT_ID,
     process.env.PAYPAL_CLIENT_SECRET,
