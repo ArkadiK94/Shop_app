@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require("fs");
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -20,6 +21,11 @@ const errorFunctionSend = require("./util/errorSend");
 
 const app = express();
 const csrfProtection = csrf();
+
+if(!fs.existsSync("images")){
+  fs.mkdirSync("images");
+}
+
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb)=>{
     cb(null, "images");
