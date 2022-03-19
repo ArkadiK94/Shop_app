@@ -20,9 +20,9 @@ router.post(
   '/add-product',
   isAuth, 
   [
-    body("title").isLength({min:1}).isString().trim(),
+    body("title").isLength({min:1,max:10}).isString().trim(),
     body("price").isLength({min:1}).isFloat(),
-    body("description").isLength({min:1}).trim()
+    body("description").isLength({min:1,max:30}).trim()
   ],
   adminController.postAddProduct
 );

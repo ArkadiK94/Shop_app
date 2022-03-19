@@ -1,11 +1,9 @@
-const fs = require("fs");
-
-const deleteFile = (filePath)=>{
-  fs.unlink(filePath, (err)=>{
-    if(err){
-      throw new Error(err)
-    }
-  });
+const deleteFile = (filePath,s3)=>{
+  const key = filePath.split("/")[3];
+  s3.deleteObject({Bucket:process.env.BUCKET, Key:key}).promise()
+    .catch(err => {
+      throw new Error(err);
+    });
 }
 
 exports.deleteFile = deleteFile;

@@ -10,6 +10,8 @@ const flash = require('connect-flash');
 const multer = require('multer');
 const compression = require("compression");
 const helmet = require("helmet");
+const aws = require("aws-sdk");
+const multerS3 = require("multer-s3");
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -24,26 +26,23 @@ const errorFunctionSend = require("./util/errorSend");
 const app = express();
 const csrfProtection = csrf();
 
-if(!fs.existsSync("images")){
-  fs.mkdirSync("images");
-}
-
-const fileStorage = multer.diskStorage({
-  destination: (req, file, cb)=>{
-    cb(null, "images");
-  },
-  filename: (req, file, cb)=>{
-    const date = (new Date().toISOString()).replace(/:/g,".");
-    cb(null, date +'-name_' + file.originalname);
-  }
+aws.config.update({
+  secretAccessKey: process.env.ACCESS_SECRET,
+  accessKeyId: process.env.ACCESS_KEY,
+  region: process.env.REGION
 });
-const fileFilter = (req, file, cb)=>{
-  if(file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-}
+const s3 = new aws.S3();
+const upload = multer({
+  storage:multerS3({
+    bucket: process.env.BUCKET,
+    s3: s3,
+    acl:"public-read",
+    key:(req,file,cb)=>{
+      const date = (new Date().toISOString()).replace(/:/g,".");
+      cb(null, date +'-name_' + file.originalname);
+    }
+  })
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -55,10 +54,9 @@ const store = new MongoDBStore({
 });
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single("image"));
+app.use(upload.single("image"));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use("/images",express.static(path.join(__dirname, 'images')));
 
 app.use(compression());
 app.use(helmet({
@@ -69,7 +67,8 @@ app.use(helmet({
     directives: {
       "default-src": ["'self'","paypal.com","*.paypal.com"],
       "script-src": ["'self'","*.paypal.com"],
-      "style-src": ["'self'","https:", "'unsafe-inline'"]
+      "style-src": ["'self'","https:", "'unsafe-inline'"],
+      "img-src": ["'self'","data:","*.amazonaws.com"]
     }
   },
   crossOriginEmbedderPolicy: false,
@@ -96,6 +95,7 @@ app.use((req, res, next)=>{
     User.findById(req.session.userId)
     .then((user)=>{
       req.session.user = user;
+      req.s3 = s3;
       next();
     })
     .catch(err => {
@@ -114,7 +114,6 @@ app.use(errorRoutes);
 app.use(errorController.get404);
 
 app.use((err, req, res ,next)=>{
-  console.log(err);
   let statusCode = err.httpStatusCode
   if(!statusCode){
     statusCode = 500;
@@ -132,6 +131,5 @@ mongoose.connect(process.env.MONGODB_URI)
     app.listen(process.env.PORT||3000);
   })
   .catch(err => { 
-    console.log(process.env.MONGODB_URI);
     throw new Error(err);
   });

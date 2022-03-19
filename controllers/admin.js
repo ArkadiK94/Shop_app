@@ -59,7 +59,7 @@ exports.postAddProduct = (req, res, next) => {
       }
     });
   }
-  const imageUrl = `/images/${imageFile.filename}`;
+  const imageUrl = imageFile.location;
   const newProduct = new Product({title, imageUrl, price, description, userId: user});
 
   newProduct.save()
@@ -126,8 +126,8 @@ exports.postEditProduct = (req, res, next) => {
       } 
       product.title = title;
       if(imageFile){
-        fileHelper.deleteFile(`./${product.imageUrl}`); 
-        const imageUrl = `/images/${imageFile.filename}`;
+        fileHelper.deleteFile(`${product.imageUrl}`,req.s3); 
+        const imageUrl = imageFile.location;
         product.imageUrl = imageUrl;
       }
       product.price = price;
@@ -152,7 +152,7 @@ exports.deleteProduct = (req, res, next)=>{
       if(product.userId.toString() !== user._id.toString()){
         return res.redirect("/");
       }
-      fileHelper.deleteFile(`./${product.imageUrl}`); 
+      fileHelper.deleteFile(`${product.imageUrl}`,req.s3); 
       return product.remove()
         .then(()=>{
           return User.updateMany(

@@ -14,6 +14,14 @@
 .product__title {
     font-size: 1.2rem;
     text-align: center;
+    background-color: white;
+    display: block;
+    width: 120px;
+    text-align: center;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: #00695c;
+    border-width: 3px;
 }
 
 .product__price {

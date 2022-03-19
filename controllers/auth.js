@@ -11,7 +11,7 @@ const errorFunctionSend = require("../util/errorSend");
 
 const transporter = nodemailer.createTransport(sendgridTransport({
   auth:{
-    api_key: process.env.SendGrid_API_Key
+    api_key: process.env.SENDGRID_API_KEY
   }
 })); 
 
