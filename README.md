@@ -13,6 +13,7 @@ Technologies that we used:
 8. multer - Upload files
 9. dotenv - Use environment variables
 10. paypal - As a payment service
+11. aws simple cloud storage (S3) - For storing the images so they will not disappear when the hosting virtual server reloads
 
 Important features from NodeJS and other used libraries:
 1. MVC - The model view controller
