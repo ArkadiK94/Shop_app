@@ -135,6 +135,7 @@ exports.getOrders = (req, res, next) => {
       orders.forEach(order=>{
         total += order.totalPrice;
       });
+      total = total.toFixed(2);
       res.render('shop/orders', {
         path: '/orders',
         pageTitle: 'Your Orders',

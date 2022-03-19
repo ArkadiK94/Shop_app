@@ -9,6 +9,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
 const multer = require('multer');
 const compression = require("compression");
+const helmet = require("helmet");
 
 const errorController = require('./controllers/error');
 const User = require('./models/user');
@@ -60,7 +61,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use("/images",express.static(path.join(__dirname, 'images')));
 
 app.use(compression());
-
+app.use(helmet({
+  frameguard:{
+    action: "deny"
+  },
+  contentSecurityPolicy:{
+    directives: {
+      "default-src": ["'self'","paypal.com","*.paypal.com"],
+      "script-src": ["'self'","*.paypal.com"],
+      "style-src": ["'self'","https:", "'unsafe-inline'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false
+}));
 app.use(session({
   secret: "this is a secret code",
   resave: false,
